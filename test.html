@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Tetris Tests</title>
+  </head>
+  <body>
+    <h1>Tetris Tests</h1>
+    <canvas id="gameCanvas" width="300" height="600"></canvas>
+    <canvas id="nextCanvas" width="120" height="120"></canvas>
+
+    <button id="startBtn">Start</button>
+    <button id="pauseBtn">Pause</button>
+
+    <div id="gameOverlay"></div>
+    <div id="overlayTitle"></div>
+    <div id="overlayMessage"></div>
+
+    <span id="score"></span>
+    <span id="lines"></span>
+    <span id="level"></span>
+    <span id="highScore"></span>
+
+    <script src="tetris.js"></script>
+    <script>
+      localStorage.setItem("tetrisHighScore", "500");
+
+      const game = new Tetris();
+
+      if (game.highScore === 500) {
+        document.body.innerHTML += "<p>PASS: High score is persistent.</p>";
+      } else {
+        document.body.innerHTML += "<p>FAIL: High score is not persistent.</p>";
+      }
+    </script>
+  </body>
+  <p id="result"></p>
+</html>

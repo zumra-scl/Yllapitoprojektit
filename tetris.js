@@ -21,8 +21,8 @@ class Tetris {
         this.gamePaused = false;
         this.gameOver = false;
         
-        // Session storage for high score
-        this.highScore = parseInt(sessionStorage.getItem('tetrisHighScore')) || 0;
+        // Local storage for high score
+        this.highScore = parseInt(localStorage.getItem('tetrisHighScore')) || 0;
         
         // Initialize
         this.initBoard();
@@ -334,7 +334,7 @@ class Tetris {
         // Update high score
         if (this.score > this.highScore) {
             this.highScore = this.score;
-            sessionStorage.setItem('tetrisHighScore', this.highScore.toString());
+            localStorage.setItem('tetrisHighScore', this.highScore.toString());
         }
         
         document.getElementById('startBtn').disabled = false;
