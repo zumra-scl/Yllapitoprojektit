@@ -179,7 +179,10 @@ class Tetris {
 
     this.gamePaused = !this.gamePaused;
     const pauseBtn = document.getElementById("pauseBtn");
+    const pauseMessage = document.getElementById("pauseMessage");
+
     pauseBtn.textContent = this.gamePaused ? "Resume" : "Pause";
+    pauseMessage.style.display = this.gamePaused ? "block" : "none";
 
     if (!this.gamePaused) {
       this.gameLoop();
@@ -309,7 +312,8 @@ class Tetris {
       this.level = Math.floor(this.lines / 10) + 1;
 
       // Scoring: more points for clearing multiple lines at once
-      this.score += linesCleared * 100 * this.level;
+      const lineScores = [0, 100, 300, 500, 800];
+      this.score += lineScores[linesCleared] * this.level;
 
       this.updateDisplay();
     }
