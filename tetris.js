@@ -179,7 +179,10 @@ class Tetris {
 
     this.gamePaused = !this.gamePaused;
     const pauseBtn = document.getElementById("pauseBtn");
+    const pauseMessage = document.getElementById("pauseMessage");
+
     pauseBtn.textContent = this.gamePaused ? "Resume" : "Pause";
+    pauseMessage.style.display = this.gamePaused ? "block" : "none";
 
     if (!this.gamePaused) {
       this.gameLoop();
@@ -256,7 +259,6 @@ class Tetris {
     while (this.movePiece(0, 1)) {
       this.score += 2;
     }
-    this.updateDisplay();
   }
 
   isValidMove(shape, x, y) {
