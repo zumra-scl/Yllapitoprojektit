@@ -8,7 +8,7 @@ class Tetris {
     // Game constants
     this.BOARD_WIDTH = 10;
     this.BOARD_HEIGHT = 20;
-    this.BLOCK_SIZE = 27;
+    this.BLOCK_SIZE = 30;
 
     // Game state
     this.board = [];
@@ -179,7 +179,10 @@ class Tetris {
 
     this.gamePaused = !this.gamePaused;
     const pauseBtn = document.getElementById("pauseBtn");
+    const pauseMessage = document.getElementById("pauseMessage");
+
     pauseBtn.textContent = this.gamePaused ? "Resume" : "Pause";
+    pauseMessage.style.display = this.gamePaused ? "block" : "none";
 
     if (!this.gamePaused) {
       this.gameLoop();
