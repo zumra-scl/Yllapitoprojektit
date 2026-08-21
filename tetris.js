@@ -1,4 +1,116 @@
 class Tetris {
+    constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.nextCanvas = document.getElementById('nextCanvas');
+        this.nextCtx = this.nextCanvas.getContext('2d');
+        
+        // Game constants
+        this.BOARD_WIDTH = 10;
+        this.BOARD_HEIGHT = 20;
+        this.BLOCK_SIZE = 30;
+        
+        // Game state
+        this.board = [];
+        this.currentPiece = null;
+        this.nextPiece = null;
+        this.score = 0;
+        this.lines = 0;
+        this.level = 1;
+        this.gameRunning = false;
+        this.gamePaused = false;
+        this.gameOver = false;
+        
+        // Local storage for high score
+        this.highScore = parseInt(localStorage.getItem('tetrisHighScore')) || 0;
+        
+        // Initialize
+        this.initBoard();
+        this.initPieces();
+        this.bindEvents();
+        this.updateDisplay();
+    }
+    
+    initBoard() {
+        this.board = [];
+        for (let y = 0; y < this.BOARD_HEIGHT; y++) {
+            this.board[y] = [];
+            for (let x = 0; x < this.BOARD_WIDTH; x++) {
+                this.board[y][x] = 0;
+            }
+        }
+    }
+    
+    initPieces() {
+        // Tetris pieces (I, O, T, S, Z, J, L)
+        this.pieces = {
+            I: {
+                shape: [
+                    [1, 1, 1, 1]
+                ],
+                color: '#00f5ff'
+            },
+            O: {
+                shape: [
+                    [1, 1],
+                    [1, 1]
+                ],
+                color: '#ffff00'
+            },
+            T: {
+                shape: [
+                    [0, 1, 0],
+                    [1, 1, 1]
+                ],
+                color: '#a000f0'
+            },
+            S: {
+                shape: [
+                    [0, 1, 1],
+                    [1, 1, 0]
+                ],
+                color: '#00f000'
+            },
+            Z: {
+                shape: [
+                    [1, 1, 0],
+                    [0, 1, 1]
+                ],
+                color: '#f00000'
+            },
+            J: {
+                shape: [
+                    [1, 0, 0],
+                    [1, 1, 1]
+                ],
+                color: '#0000f0'
+            },
+            L: {
+                shape: [
+                    [0, 0, 1],
+                    [1, 1, 1]
+                ],
+                color: '#f0a000'
+            }
+        };
+        
+        this.pieceTypes = Object.keys(this.pieces);
+    }
+    
+    createPiece(type) {
+        const piece = this.pieces[type];
+        return {
+            type: type,
+            shape: piece.shape,
+            color: piece.color,
+            x: Math.floor(this.BOARD_WIDTH / 2) - Math.floor(piece.shape[0].length / 2),
+            y: 0
+        };
+    }
+    
+    getRandomPiece() {
+        const randomIndex = Math.floor(Math.random() * this.pieceTypes.length);
+        return this.createPiece(this.pieceTypes[randomIndex]);
   constructor() {
     this.canvas = document.getElementById("gameCanvas");
     this.ctx = this.canvas.getContext("2d");
