@@ -124,15 +124,7 @@ class Tetris {
 
     // Keyboard events
     document.addEventListener("keydown", (e) => {
-      if (!this.gameRunning) return;
-
-      if (e.code === "KeyP") {
-        e.preventDefault();
-        this.togglePause();
-        return;
-      }
-
-      if (this.gamePaused) return;
+      if (!this.gameRunning || this.gamePaused) return;
 
       switch (e.code) {
         case "ArrowLeft":
@@ -187,7 +179,10 @@ class Tetris {
 
     this.gamePaused = !this.gamePaused;
     const pauseBtn = document.getElementById("pauseBtn");
+    const pauseMessage = document.getElementById("pauseMessage");
+
     pauseBtn.textContent = this.gamePaused ? "Resume" : "Pause";
+    pauseMessage.style.display = this.gamePaused ? "block" : "none";
 
     if (!this.gamePaused) {
       this.gameLoop();
