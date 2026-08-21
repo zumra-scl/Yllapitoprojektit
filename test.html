@@ -1,10 +1,12 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
     <title>Tetris Tests</title>
   </head>
   <body>
-    <h1>Tetris Tests</h1>
+    <h1>Tetris Line Clear Tests</h1>
+
     <canvas id="gameCanvas" width="300" height="600"></canvas>
     <canvas id="nextCanvas" width="120" height="120"></canvas>
 
@@ -20,18 +22,32 @@
     <span id="level"></span>
     <span id="highScore"></span>
 
-    <script src="tetris.js"></script>
-    <script>
-      localStorage.setItem("tetrisHighScore", "500");
+    <p id="result"></p>
 
+    <script src="tetris.js"></script>
+
+    <script>
       const game = new Tetris();
 
-      if (game.highScore === 500) {
-        document.body.innerHTML += "<p>PASS: High score is persistent.</p>";
+      game.level = 1;
+      game.score = 0;
+
+      // Fill 4 rows completely
+      for (let y = 16; y < 20; y++) {
+        for (let x = 0; x < game.BOARD_WIDTH; x++) {
+          game.board[y][x] = "filled";
+        }
+      }
+
+      game.clearLines();
+
+      if (game.score === 800 && game.lines === 4) {
+        document.getElementById("result").textContent =
+          "PASS: Four line clear gives 800 points.";
       } else {
-        document.body.innerHTML += "<p>FAIL: High score is not persistent.</p>";
+        document.getElementById("result").textContent =
+          `FAIL: Expected 800 points, got ${game.score}.`;
       }
     </script>
   </body>
-  <p id="result"></p>
 </html>
