@@ -1,116 +1,4 @@
 class Tetris {
-    constructor() {
-        this.canvas = document.getElementById('gameCanvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.nextCanvas = document.getElementById('nextCanvas');
-        this.nextCtx = this.nextCanvas.getContext('2d');
-        
-        // Game constants
-        this.BOARD_WIDTH = 10;
-        this.BOARD_HEIGHT = 20;
-        this.BLOCK_SIZE = 30;
-        
-        // Game state
-        this.board = [];
-        this.currentPiece = null;
-        this.nextPiece = null;
-        this.score = 0;
-        this.lines = 0;
-        this.level = 1;
-        this.gameRunning = false;
-        this.gamePaused = false;
-        this.gameOver = false;
-        
-        // Local storage for high score
-        this.highScore = parseInt(localStorage.getItem('tetrisHighScore')) || 0;
-        
-        // Initialize
-        this.initBoard();
-        this.initPieces();
-        this.bindEvents();
-        this.updateDisplay();
-    }
-    
-    initBoard() {
-        this.board = [];
-        for (let y = 0; y < this.BOARD_HEIGHT; y++) {
-            this.board[y] = [];
-            for (let x = 0; x < this.BOARD_WIDTH; x++) {
-                this.board[y][x] = 0;
-            }
-        }
-    }
-    
-    initPieces() {
-        // Tetris pieces (I, O, T, S, Z, J, L)
-        this.pieces = {
-            I: {
-                shape: [
-                    [1, 1, 1, 1]
-                ],
-                color: '#00f5ff'
-            },
-            O: {
-                shape: [
-                    [1, 1],
-                    [1, 1]
-                ],
-                color: '#ffff00'
-            },
-            T: {
-                shape: [
-                    [0, 1, 0],
-                    [1, 1, 1]
-                ],
-                color: '#a000f0'
-            },
-            S: {
-                shape: [
-                    [0, 1, 1],
-                    [1, 1, 0]
-                ],
-                color: '#00f000'
-            },
-            Z: {
-                shape: [
-                    [1, 1, 0],
-                    [0, 1, 1]
-                ],
-                color: '#f00000'
-            },
-            J: {
-                shape: [
-                    [1, 0, 0],
-                    [1, 1, 1]
-                ],
-                color: '#0000f0'
-            },
-            L: {
-                shape: [
-                    [0, 0, 1],
-                    [1, 1, 1]
-                ],
-                color: '#f0a000'
-            }
-        };
-        
-        this.pieceTypes = Object.keys(this.pieces);
-    }
-    
-    createPiece(type) {
-        const piece = this.pieces[type];
-        return {
-            type: type,
-            shape: piece.shape,
-            color: piece.color,
-            x: Math.floor(this.BOARD_WIDTH / 2) - Math.floor(piece.shape[0].length / 2),
-            y: 0
-        };
-    }
-    
-    getRandomPiece() {
-        const randomIndex = Math.floor(Math.random() * this.pieceTypes.length);
-        return this.createPiece(this.pieceTypes[randomIndex]);
   constructor() {
     this.canvas = document.getElementById("gameCanvas");
     this.ctx = this.canvas.getContext("2d");
@@ -133,8 +21,8 @@ class Tetris {
     this.gamePaused = false;
     this.gameOver = false;
 
-    // Session storage for high score
-    this.highScore = parseInt(sessionStorage.getItem("tetrisHighScore")) || 0;
+    // Local storage for high score
+    this.highScore = parseInt(localStorage.getItem("tetrisHighScore")) || 0;
 
     // Initialize
     this.initBoard();
@@ -236,32 +124,42 @@ class Tetris {
 
     // Keyboard events
     document.addEventListener("keydown", (e) => {
-      if (!this.gameRunning || this.gamePaused) return;
+      if (!this.gameRunning) return;
+
+      // P should work even when the game is paused
+      if (e.code === "KeyP") {
+        e.preventDefault();
+        this.togglePause();
+        return;
+      }
+
+      if (this.gamePaused) return;
 
       switch (e.code) {
         case "ArrowLeft":
           e.preventDefault();
           this.movePiece(-1, 0);
+          this.draw();
           break;
         case "ArrowRight":
           e.preventDefault();
           this.movePiece(1, 0);
+          this.draw();
           break;
         case "ArrowDown":
           e.preventDefault();
           this.movePiece(0, 1);
+          this.draw();
           break;
         case "ArrowUp":
           e.preventDefault();
           this.rotatePiece();
+          this.draw();
           break;
         case "Space":
           e.preventDefault();
           this.hardDrop();
-          break;
-        case "KeyP":
-          e.preventDefault();
-          this.togglePause();
+          this.draw();
           break;
       }
     });
@@ -281,8 +179,14 @@ class Tetris {
 
     document.getElementById("startBtn").disabled = true;
     document.getElementById("pauseBtn").disabled = false;
+    document.getElementById("pauseBtn").textContent = "Pause";
     document.getElementById("gameOverlay").classList.remove("active");
 
+    const pauseMessage = document.getElementById("pauseMessage");
+    pauseMessage.style.display = "none";
+
+    this.updateDisplay();
+    this.draw();
     this.gameLoop();
   }
 
@@ -315,7 +219,8 @@ class Tetris {
   }
 
   getDropSpeed() {
-    return Math.max(50, 1000 - (this.level - 1) * 100);
+    // Faster starting speed for TETRIS-9
+    return Math.max(50, 700 - (this.level - 1) * 100);
   }
 
   update() {
@@ -371,6 +276,8 @@ class Tetris {
     while (this.movePiece(0, 1)) {
       this.score += 2;
     }
+
+    this.updateDisplay();
   }
 
   isValidMove(shape, x, y) {
@@ -400,6 +307,7 @@ class Tetris {
         if (this.currentPiece.shape[row][col]) {
           const x = this.currentPiece.x + col;
           const y = this.currentPiece.y + row;
+
           if (y >= 0) {
             this.board[y][x] = this.currentPiece.color;
           }
@@ -460,12 +368,15 @@ class Tetris {
     // Update high score
     if (this.score > this.highScore) {
       this.highScore = this.score;
-      sessionStorage.setItem("tetrisHighScore", this.highScore.toString());
+      localStorage.setItem("tetrisHighScore", this.highScore.toString());
     }
 
     document.getElementById("startBtn").disabled = false;
     document.getElementById("pauseBtn").disabled = true;
     document.getElementById("pauseBtn").textContent = "Pause";
+
+    const pauseMessage = document.getElementById("pauseMessage");
+    pauseMessage.style.display = "none";
 
     // Show game over overlay
     document.getElementById("overlayTitle").textContent = "Game Over!";
@@ -521,6 +432,7 @@ class Tetris {
         if (piece.shape[row][col]) {
           const x = piece.x + col;
           const y = piece.y + row;
+
           if (y >= 0) {
             this.drawBlock(ctx, x, y, piece.color);
           }
